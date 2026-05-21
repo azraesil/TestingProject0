@@ -70,16 +70,27 @@ class PriceCalculatorSpecTest {
 
     //  Exceptional / Invalid Inputs 
 
-    // Testing weird/invalid inputs like negative numbers or >100% discount.
-    //  We will handle these properly with asserts in Task 3, but for now we just check the raw math.
-    @ParameterizedTest(name = "Invalid base={0}, disc={1}%, tax={2}% => result={3}")
-    @CsvSource({
-            "-100.0, 10.0, 10.0, -99.0",  // Negative base price
-            "100.0, -10.0, 10.0, 121.0",  // Negative discount 
-            "100.0, 10.0, -10.0, 81.0",   // Negative tax 
-            "100.0, 150.0, 10.0, -55.0"   // Discount > 100% 
-    })
-    void invalidInputs_CalculateMath(double base, double disc, double tax, double expected) {
-        assertThat(calculator.calculate(base, disc, tax)).isCloseTo(expected, within(0.001));
+    @Test
+    void invalidInput_NegativeBasePrice() {
+        assertThatThrownBy(() -> calculator.calculate(-100.0, 10.0, 10.0))
+                .isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    void invalidInput_NegativeDiscount() {
+        assertThatThrownBy(() -> calculator.calculate(100.0, -10.0, 10.0))
+                .isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    void invalidInput_NegativeTax() {
+        assertThatThrownBy(() -> calculator.calculate(100.0, 10.0, -10.0))
+                .isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    void invalidInput_DiscountAbove100() {
+        assertThatThrownBy(() -> calculator.calculate(100.0, 150.0, 10.0))
+                .isInstanceOf(AssertionError.class);
     }
 }
